@@ -154,8 +154,10 @@ class Fortio:
             self.mesh = "linkerd"
         elif mesh == "istio":
             self.mesh = "istio"
-        else:
-            sys.exit("invalid mesh %s, must be istio or linkerd" % mesh)
+        else: 
+            self.mesh == mesh
+        #else:
+        #    sys.exit("invalid mesh %s, must be istio or linkerd" % mesh)
 
     def get_protocol_uri_fragment(self):
         return "https" if self.protocol_mode == "grpc" else self.protocol_mode
@@ -234,7 +236,10 @@ class Fortio:
         elif self.mesh == "linkerd":
             labels += "_"
             labels += "linkerd"
-
+        else:
+            labels += "_"
+            labels += self.mesh
+            
         if self.extra_labels is not None:
             labels += "_" + self.extra_labels
 
