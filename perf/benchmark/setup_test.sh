@@ -35,6 +35,7 @@ CLIENT_REPLICA="${CLIENT_REPLICA:-1}"
 ISTIO_INJECT="${ISTIO_INJECT:-false}"
 LINKERD_INJECT="${LINKERD_INJECT:-disabled}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
+FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 echo "linkerd inject is ${LINKERD_INJECT}"
 
 mkdir -p "${TMPDIR}"
@@ -64,7 +65,7 @@ function run_test() {
       --set client.injectL="${LINKERD_INJECT}" \
       --set domain="${DNS_DOMAIN}" \
       --set interceptionMode="${INTERCEPTION_MODE}" \
-      --set fortioImage="fortio/fortio:latest_release" \
+      --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
           . > "${TMPDIR}/${NAMESPACE}.yaml"
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
 

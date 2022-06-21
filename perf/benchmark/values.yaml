@@ -10,8 +10,8 @@ proxy:
 
 appresources1:
   requests:
-    cpu: "1500m"
-    memory: "1000Mi"
+#    cpu: "1500m"
+#    memory: "1000Mi"
 
 fortioImage: fortio/fortio:latest_release
 curlImage: cfmanteiga/alpine-bash-curl-jq:latest
