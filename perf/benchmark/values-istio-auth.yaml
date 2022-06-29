@@ -4,7 +4,7 @@ global:
   mtls:
     # Default setting for service-to-service mtls. Can be set explicitly using
     # destination rules or service annotations.
-    enabled: true
+    enabled: false
 
   # Default is 10s second
   refreshInterval: 10s
