@@ -34,6 +34,8 @@ SERVER_REPLICA="${SERVER_REPLICA:-1}"
 CLIENT_REPLICA="${CLIENT_REPLICA:-1}"
 ISTIO_INJECT="${ISTIO_INJECT:-false}"
 LINKERD_INJECT="${LINKERD_INJECT:-disabled}"
+KUMA_INJECT="${KUMA_INJECT:-disabled}"
+NGINX_INJECT="${NGINX_INJECT:-false}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 echo "linkerd inject is ${LINKERD_INJECT}"
@@ -63,6 +65,10 @@ function run_test() {
       --set client.inject="${ISTIO_INJECT}" \
       --set server.injectL="${LINKERD_INJECT}" \
       --set client.injectL="${LINKERD_INJECT}" \
+      --set server.injectK="${KUMA_INJECT}" \
+      --set client.injectK="${KUMA_INJECT}" \
+      --set server.injectN="${NGINX_INJECT}" \
+      --set client.injectN="${NGINX_INJECT}" \
       --set domain="${DNS_DOMAIN}" \
       --set interceptionMode="${INTERCEPTION_MODE}" \
       --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
@@ -86,14 +92,14 @@ done
 
 kubectl create ns "${NAMESPACE}" || true
 
-if [[ "$ISTIO_INJECT" == "true" ]]
-then
-  kubectl label namespace "${NAMESPACE}" istio-injection=enabled --overwrite || true
-fi
+#if [[ "$ISTIO_INJECT" == "true" ]]
+#then
+#  kubectl label namespace "${NAMESPACE}" istio-injection=enabled --overwrite || true
+#fi
 
-if [[ "$LINKERD_INJECT" == "enabled" ]]
-then
-  kubectl annotate namespace "${NAMESPACE}" linkerd.io/inject=enabled || true
-fi
+#if [[ "$LINKERD_INJECT" == "enabled" ]]
+#then
+#  kubectl annotate namespace "${NAMESPACE}" linkerd.io/inject=enabled || true
+#fi
 
 run_test
