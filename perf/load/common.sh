@@ -28,14 +28,17 @@ H2UPGRADE=${H2UPGRADE:-"false"}
 function run_test() {
   local ns=${1:?"namespaces"}
   local prefix=${2:?"prefix name for service. typically svc-"}
-  local injection_label=${3:?"injection label"}
+  #local injection_label=${3:?"injection label"}
   MULTI_CLUSTER=${MULTI_CLUSTER:-"false"}
   CLUSTER1=${CLUSTER1:-"false"}
   CLUSTER2=${CLUSTER2:-"false"}
   VM_ENABLED="${VM_ENABLED:-false}"
+  local LABEL=${4:-""}
+  local ANNOTATION=${5:-""}
   YAML=$(mktemp).yml
   # shellcheck disable=SC2086
-  helm -n ${ns} template \
+  if [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
+    helm -n ${ns} template \
           --set serviceNamePrefix="${prefix}" \
           --set Namespace="${ns}" \
           --set domain="${DNS_DOMAIN}" \
@@ -46,11 +49,55 @@ function run_test() {
           --set multicluster.cluster1="${CLUSTER1}" \
           --set multicluster.cluster2="${CLUSTER2}" \
           --set vm.enabled="${VM_ENABLED}" \
+          --set-string label.${LABEL} \
           . > "${YAML}"
+  elif [ "$LABEL" == "" ] && [ "$ANNOTATION" != "" ]; then
+    helm -n ${ns} template \
+          --set serviceNamePrefix="${prefix}" \
+          --set Namespace="${ns}" \
+          --set domain="${DNS_DOMAIN}" \
+          --set ingress="${GATEWAY_URL}" \
+          --set https="${HTTPS}" \
+          --set h2upgrade="${H2UPGRADE}" \
+          --set multicluster.enabled="${MULTI_CLUSTER}" \
+          --set multicluster.cluster1="${CLUSTER1}" \
+          --set multicluster.cluster2="${CLUSTER2}" \
+          --set vm.enabled="${VM_ENABLED}" \
+          --set-string annotation.'"${ANNOTATION}"' \
+          . > "${YAML}"
+  elif [ "$LABEL" == "" ] && [ "$ANNOTATION" == "" ]; then
+    helm -n ${ns} template \
+          --set serviceNamePrefix="${prefix}" \
+          --set Namespace="${ns}" \
+          --set domain="${DNS_DOMAIN}" \
+          --set ingress="${GATEWAY_URL}" \
+          --set https="${HTTPS}" \
+          --set h2upgrade="${H2UPGRADE}" \
+          --set multicluster.enabled="${MULTI_CLUSTER}" \
+          --set multicluster.cluster1="${CLUSTER1}" \
+          --set multicluster.cluster2="${CLUSTER2}" \
+          --set vm.enabled="${VM_ENABLED}" \
+          . > "${YAML}"  
+  else
+    helm -n ${ns} template \
+          --set serviceNamePrefix="${prefix}" \
+          --set Namespace="${ns}" \
+          --set domain="${DNS_DOMAIN}" \
+          --set ingress="${GATEWAY_URL}" \
+          --set https="${HTTPS}" \
+          --set h2upgrade="${H2UPGRADE}" \
+          --set multicluster.enabled="${MULTI_CLUSTER}" \
+          --set multicluster.cluster1="${CLUSTER1}" \
+          --set multicluster.cluster2="${CLUSTER2}" \
+          --set vm.enabled="${VM_ENABLED}" \
+          --set annotation="${ANNOTATION}" \
+          --set-string label.'"${LABEL}"' \
+          . > "${YAML}" 
+  fi 
   echo "Wrote ${YAML}"
 
   kubectl create ns "${ns}" || true
-  kubectl label namespace "${ns}" "${injection_label}" --overwrite
+  #kubectl label namespace "${ns}" "${injection_label}" --overwrite
 
    if [[ -z "${DELETE}" ]];then
     sleep 3
@@ -70,17 +117,21 @@ function start_servicegraphs() {
   local min=${2:-"0"}
   local injection_label=${3:?"injection label"}
   local PERF_NAMESPACE_DELAY=${4:-30}
+  local LABEL=${5:-""}
+  local ANNOTATION=${6}
 
    # shellcheck disable=SC2004
    for ((ii=$min; ii<$nn; ii++)) {
     ns=$(printf 'service-graph%.2d' "${ii}")
     prefix=$(printf 'svc%.2d-' "${ii}")
     if [[ -z "${DELETE}" ]];then
-      ${CMD} run_test "${ns}" "${prefix}" "${injection_label}"
-      ${CMD} "${WD}/loadclient/setup_test.sh" "${ns}" "${prefix}" "${injection_label}"
+      ${CMD} run_test "${ns}" "${prefix}" "${injection_label}" "${LABEL}" "${ANNOTATION}"
+      echo "done1"
+      ${CMD} "${WD}/loadclient/setup_test.sh" "${ns}" "${prefix}" "${injection_label}" "${LABEL}" "${ANNOTATION}"
     else
-      ${CMD} "${WD}/loadclient/setup_test.sh" "${ns}" "${prefix}" "${injection_label}"
-      ${CMD} run_test "${ns}" "${prefix}" "${injection_label}"
+      ${CMD} "${WD}/loadclient/setup_test.sh" "${ns}" "${prefix}" "${injection_label}" "${LABEL}" "${ANNOTATION}"
+      echo "done2"
+      ${CMD} run_test "${ns}" "${prefix}" "${injection_label}" "${LABEL}" "${ANNOTATION}"
     fi
 
     sleep "${PERF_NAMESPACE_DELAY}"

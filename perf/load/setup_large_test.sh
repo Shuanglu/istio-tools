@@ -29,6 +29,30 @@ source common.sh
 NUM=${1:?"number of namespaces. 20 x this number"}
 START=${2:-"0"}
 INJECTION_LABEL=${3:-"istio-injection=enabled"}
-PERF_NAMESPACE_DELAY=${4:-30}
 
-start_servicegraphs "${NUM}" "${START}" "${INJECTION_LABEL}" "${PERF_NAMESPACE_DELAY}"
+MESH=${4:-"istio"}
+INJECT=${5:-"false"}
+
+if [ "$INJECT" == "true" ]; then
+    echo "Mesh is $MESH. Setting the label/annotation"
+    case $MESH in 
+        "istio")
+        LABEL='sidecar\.istio\.io\/inject=true'
+        ;;
+        "kuma")
+        LABEL='kuma.\io\/sidecar-injection=enabled'
+        ;;
+        "nginx")
+        ANNOTATION='injector\.nsm\.nginx\.com\/auto-inject=true'
+        ;;
+        *)
+        LABEL=${5}
+        ANNOTATION=${6}
+        ;;
+    esac
+fi
+
+        
+
+
+start_servicegraphs "${NUM}" "${START}" "${INJECTION_LABEL}" "${PERF_NAMESPACE_DELAY}" "${LABEL}" "${ANNOTATION}"

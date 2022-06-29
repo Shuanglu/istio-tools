@@ -192,7 +192,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0
         role: service
         version: v1
@@ -250,7 +256,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0
         role: service
         version: v2
@@ -321,7 +333,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-0
         role: service
         version: v1
@@ -392,7 +410,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-1
         role: service
         version: v1
@@ -463,7 +487,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-2
         role: service
         version: v1
@@ -534,7 +564,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-3
         role: service
         version: v1
@@ -605,7 +641,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-4
         role: service
         version: v1
@@ -728,7 +770,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-0-0
         role: service
         version: v1
@@ -799,7 +847,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-1-0
         role: service
         version: v1
@@ -870,7 +924,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-2-0
         role: service
         version: v1
@@ -941,7 +1001,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-3-0
         role: service
         version: v1
@@ -1012,7 +1078,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-4-0
         role: service
         version: v1
@@ -1371,7 +1443,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-5-0
         role: service
         version: v1
@@ -1442,7 +1520,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-6-0
         role: service
         version: v1
@@ -1513,7 +1597,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-7-0
         role: service
         version: v1
@@ -1584,7 +1674,13 @@ spec:
 {{- if .Values.prometheus_scrape }}
         prometheus.io/scrape: "true"
 {{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation  }}
+{{- end }}
       labels:
+{{- if .Values.label }}
+        {{ toYaml .Values.label }}
+{{- end }}
         app: {{ .Values.serviceNamePrefix }}0-8-0
         role: service
         version: v1

@@ -13,9 +13,13 @@ spec:
     metadata:
       labels:
         app: client
-      annotations:
-        sidecar.istio.io/inject: "false"
         prometheus.io/scrape: "true"
+{{- if .Values.label }}
+        {{ toYaml .Values.label  }}
+{{- end }}
+{{- if .Values.annotation }}
+        {{ toYaml .Values.annotation }}
+{{- end }}
     spec:
       containers:
       - args:

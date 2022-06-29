@@ -18,7 +18,7 @@ proxyCPU: 100m
 proxyMemory: 128Mi
 
 # If enabled, strict mTLS will be set for the namespace
-mtls: true
+mtls: false
 
 prometheus_scrape: false
 

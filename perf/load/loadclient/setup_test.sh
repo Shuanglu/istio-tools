@@ -26,7 +26,8 @@ NAMEPREFIX=${2:?"prefix name for service. typically svc-"}
 INJECTION_LABEL=${3:-"istio-injection=enabled"}
 
 HTTPS=${HTTPS:-"false"}
-
+LABEL=${5}
+ANNOTATION=${6}
 # Additional customization option for load client, e.g. "--set qps=200"
 # LOADCLIENT_EXTRA_HELM_FLAGS=${LOADCLIENT_EXTRA_HELM_FLAGS:-""}
 
@@ -41,6 +42,7 @@ fi
 SERVICEHOST="${NAMEPREFIX}0.local"
 
 function run_test() {
+
   YAML=$(mktemp).yml
   # shellcheck disable=SC2086
   helm -n ${NAMESPACE} template \
@@ -49,13 +51,15 @@ function run_test() {
     --set ingress="${GATEWAY_URL}" \
     --set domain="${DNS_DOMAIN}" \
     --set https="${HTTPS}" \
+    --set label="${LABEL}" \
+    --set annotation="${ANNOTATION}" \
     ${LOADCLIENT_EXTRA_HELM_FLAGS} \
           "${WD}" > "${YAML}"
   echo "Wrote ${YAML}"
 
   if [[ -z "${DELETE}" ]];then
     kubectl create ns "${NAMESPACE}" || true
-    kubectl label namespace "${NAMESPACE}" "${INJECTION_LABEL}" --overwrite
+    #kubectl label namespace "${NAMESPACE}" "${INJECTION_LABEL}" --overwrite
     kubectl -n "${NAMESPACE}" apply -f "${YAML}"
   else
     kubectl -n "${NAMESPACE}" delete -f "${YAML}"
