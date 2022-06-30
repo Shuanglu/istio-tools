@@ -114,13 +114,13 @@ class Prom:
             aggregate=self.aggregate)
 
     def fetch_istio_proxy_cpu_usage_by_pod_name(self,sidecar=""):
-        cpu_query = 'sum(rate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container={}}[1m])) by (pod)'.format(sidecar)
+        cpu_query = 'sum(rate(container_cpu_usage_seconds_total{{job="kubernetes-cadvisor",container={}}}[1m])) by (pod)'.format(sidecar)
         data = self.fetch_by_query(cpu_query)
         avg_cpu_dict = get_average_within_query_time_range(data, "cpu")
         return avg_cpu_dict
 
     def fetch_istio_proxy_memory_usage_by_pod_name(self,sidecar=""):
-        mem_query = 'container_memory_usage_bytes{job = "kubernetes-cadvisor", container={}}'.format(sidecar)
+        mem_query = 'container_memory_usage_bytes{{job = "kubernetes-cadvisor", container={}}}'.format(sidecar)
         data = self.fetch_by_query(mem_query)
         avg_mem_dict = get_average_within_query_time_range(data, "mem")
         return avg_mem_dict
@@ -145,14 +145,14 @@ class Prom:
         return out
 
     def fetch_cpu_by_container(self):
-        query = 'irate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}[1m])'.format(sidecar)
+        query = 'irate(container_cpu_usage_seconds_total{{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}}[1m])'.format(sidecar)
         return self.fetch(
             query,
             metric_by_deployment_by_container,
             to_mili_cpus)
 
     def fetch_memory_by_container(self,sidecar=""):
-        query = 'container_memory_usage_bytes{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}'.format(sidecar)
+        query = 'container_memory_usage_bytes{{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}}'.format(sidecar)
         return self.fetch(
             query,
             metric_by_deployment_by_container,
