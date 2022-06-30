@@ -126,7 +126,7 @@ def run_command(command):
     process.wait()
 
 
-def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", namespace=NAMESPACE, sidecar=""):
+def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", sidecar="", namespace=NAMESPACE):
     get_fortioclient_pod_cmd = "kubectl -n {namespace} get pods | grep fortioclient".format(namespace=namespace)
     fortioclient_pod_name = getoutput(get_fortioclient_pod_cmd).split(" ")[0]
     temp_dir_path = tempfile.gettempdir() + "/fortio_json_data"
