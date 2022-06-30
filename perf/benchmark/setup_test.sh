@@ -109,7 +109,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
             . > "${TMPDIR}/${NAMESPACE}.yaml"
     fi
-  echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
+  echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   cp -R ../../../kustomization "${TMPDIR}"/
   sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
   
