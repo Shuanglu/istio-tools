@@ -108,7 +108,7 @@ function run_test() {
         --set domain="${DNS_DOMAIN}" \
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-        --set-string tubimesh="${TUBIMESH}"
+        --set-string tubimesh="${TUBIMESH}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
