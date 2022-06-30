@@ -37,6 +37,7 @@ LABEL="${LABEL}"
 ANNOTATION="${ANNOTATION}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
+DEPLOYANNOTATION="${DEPLOYANNOTATION}"
 echo "linkerd inject is ${LINKERD_INJECT}"
 
 mkdir -p "${TMPDIR}/kustomization"
@@ -66,6 +67,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
         --set-string annotation."${ANNOTATION}" \
+        --set-string deployAnnotation."${DEPLOYANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
       helm -n "${NAMESPACE}" template \
@@ -80,6 +82,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
+        --set-string deployAnnotation."${DEPLOYANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
       helm -n "${NAMESPACE}" template \
@@ -94,6 +97,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
+        --set-string deployAnnotation."${DEPLOYANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     else 
         helm -n "${NAMESPACE}" template \
@@ -107,6 +111,7 @@ function run_test() {
         --set domain="${DNS_DOMAIN}" \
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+        --set-string deployAnnotation."${DEPLOYANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
