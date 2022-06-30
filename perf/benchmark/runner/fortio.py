@@ -186,6 +186,9 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
                                METRICS_SUMMARY_DURATION)
                 p = prom.Prom(promUrl, duration, start=prom_start)
                 prom_metrics = p.fetch_istio_proxy_cpu_and_mem(sidecar)
+                csv = "Labels,StartTime,RequestedQPS,ActualQPS,NumThreads,min,max,p50,p75,p90,p99,p999"
+                for key,value in prom_metrics.items() : 
+                    csv = csv + key + ","
                 if not prom_metrics:
                     print("... Not found")
                     continue
