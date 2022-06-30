@@ -107,7 +107,7 @@ function run_test() {
         --set domain="${DNS_DOMAIN}" \
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-            . > "${TMPDIR}/${NAMESPACE}.yaml"
+            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   cp -R ../../../kustomization "${TMPDIR}"/
