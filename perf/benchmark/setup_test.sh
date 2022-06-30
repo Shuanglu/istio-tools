@@ -37,7 +37,7 @@ LABEL="${LABEL}"
 ANNOTATION="${ANNOTATION}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
-DEPLOYANNOTATION="${DEPLOYANNOTATION}"
+TUBIMESH="${TUBIMESH}"
 echo "linkerd inject is ${LINKERD_INJECT}"
 
 mkdir -p "${TMPDIR}/kustomization"
@@ -96,7 +96,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-    else 
+    elif && [ "$TUBIMESH" != "" ]; then
         helm -n "${NAMESPACE}" template \
         --set rbac.enabled="${RBAC_ENABLED}" \
         --set namespace="${NAMESPACE}" \
@@ -108,6 +108,7 @@ function run_test() {
         --set domain="${DNS_DOMAIN}" \
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+        --set-string tubimesh="${TUBIMESH}"
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
