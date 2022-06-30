@@ -39,7 +39,7 @@ INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 echo "linkerd inject is ${LINKERD_INJECT}"
 
-mkdir -p "${TMPDIR}"
+mkdir -p "${TMPDIR}/kustomization"
 
 # Get pod ip range, there must be a better way, but this works.
 function pod_ip_range() {
@@ -66,7 +66,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
         --set-string annotation."${ANNOTATION}" \
-            . > "${TMPDIR}/${NAMESPACE}.yaml"
+            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
       helm -n "${NAMESPACE}" template \
         --set rbac.enabled="${RBAC_ENABLED}" \
@@ -80,7 +80,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
-            . > "${TMPDIR}/${NAMESPACE}.yaml"
+            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
       helm -n "${NAMESPACE}" template \
         --set rbac.enabled="${RBAC_ENABLED}" \
@@ -94,7 +94,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
-            . > "${TMPDIR}/${NAMESPACE}.yaml"
+            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     else 
         helm -n "${NAMESPACE}" template \
         --set rbac.enabled="${RBAC_ENABLED}" \
