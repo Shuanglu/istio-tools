@@ -52,20 +52,63 @@ function svc_ip_range() {
 
 function run_test() {
   # shellcheck disable=SC2046
-  helm -n "${NAMESPACE}" template \
-      --set rbac.enabled="${RBAC_ENABLED}" \
-      --set namespace="${NAMESPACE}" \
-      --set loadGenType="${LOAD_GEN_TYPE}" \
-      --set excludeOutboundIPRanges=$(pod_ip_range)\
-      --set includeOutboundIPRanges=$(svc_ip_range) \
-      --set server.replica="${SERVER_REPLICA}" \
-      --set client.replica="${CLIENT_REPLICA}" \
-      --set domain="${DNS_DOMAIN}" \
-      --set interceptionMode="${INTERCEPTION_MODE}" \
-      --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-      --set-string label."${LABEL}" \
-      --set-string annotation."${ANNOTATION}" \
-          . > "${TMPDIR}/${NAMESPACE}.yaml"
+  if [ "$ANNOTATION" != "" ] && [ "$LABEL" != "" ]; then
+    helm -n "${NAMESPACE}" template \
+        --set rbac.enabled="${RBAC_ENABLED}" \
+        --set namespace="${NAMESPACE}" \
+        --set loadGenType="${LOAD_GEN_TYPE}" \
+        --set excludeOutboundIPRanges=$(pod_ip_range)\
+        --set includeOutboundIPRanges=$(svc_ip_range) \
+        --set server.replica="${SERVER_REPLICA}" \
+        --set client.replica="${CLIENT_REPLICA}" \
+        --set domain="${DNS_DOMAIN}" \
+        --set interceptionMode="${INTERCEPTION_MODE}" \
+        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+        --set-string label."${LABEL}" \
+        --set-string annotation."${ANNOTATION}" \
+            . > "${TMPDIR}/${NAMESPACE}.yaml"
+  elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
+      helm -n "${NAMESPACE}" template \
+        --set rbac.enabled="${RBAC_ENABLED}" \
+        --set namespace="${NAMESPACE}" \
+        --set loadGenType="${LOAD_GEN_TYPE}" \
+        --set excludeOutboundIPRanges=$(pod_ip_range)\
+        --set includeOutboundIPRanges=$(svc_ip_range) \
+        --set server.replica="${SERVER_REPLICA}" \
+        --set client.replica="${CLIENT_REPLICA}" \
+        --set domain="${DNS_DOMAIN}" \
+        --set interceptionMode="${INTERCEPTION_MODE}" \
+        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+        --set-string label."${LABEL}" \
+            . > "${TMPDIR}/${NAMESPACE}.yaml"
+    elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
+      helm -n "${NAMESPACE}" template \
+        --set rbac.enabled="${RBAC_ENABLED}" \
+        --set namespace="${NAMESPACE}" \
+        --set loadGenType="${LOAD_GEN_TYPE}" \
+        --set excludeOutboundIPRanges=$(pod_ip_range)\
+        --set includeOutboundIPRanges=$(svc_ip_range) \
+        --set server.replica="${SERVER_REPLICA}" \
+        --set client.replica="${CLIENT_REPLICA}" \
+        --set domain="${DNS_DOMAIN}" \
+        --set interceptionMode="${INTERCEPTION_MODE}" \
+        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+        --set-string annotation."${ANNOTATION}" \
+            . > "${TMPDIR}/${NAMESPACE}.yaml"
+    else 
+        helm -n "${NAMESPACE}" template \
+        --set rbac.enabled="${RBAC_ENABLED}" \
+        --set namespace="${NAMESPACE}" \
+        --set loadGenType="${LOAD_GEN_TYPE}" \
+        --set excludeOutboundIPRanges=$(pod_ip_range)\
+        --set includeOutboundIPRanges=$(svc_ip_range) \
+        --set server.replica="${SERVER_REPLICA}" \
+        --set client.replica="${CLIENT_REPLICA}" \
+        --set domain="${DNS_DOMAIN}" \
+        --set interceptionMode="${INTERCEPTION_MODE}" \
+        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+            . > "${TMPDIR}/${NAMESPACE}.yaml"
+    fi
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
 
   # remove stdio rules

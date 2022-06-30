@@ -45,16 +45,47 @@ function run_test() {
 
   YAML=$(mktemp).yml
   # shellcheck disable=SC2086
-  helm -n ${NAMESPACE} template \
-	  --set serviceHost="${SERVICEHOST}" \
-    --set Namespace="${NAMESPACE}" \
-    --set ingress="${GATEWAY_URL}" \
-    --set domain="${DNS_DOMAIN}" \
-    --set https="${HTTPS}" \
-    --set label="${LABEL}" \
-    --set annotation="${ANNOTATION}" \
-    ${LOADCLIENT_EXTRA_HELM_FLAGS} \
-          "${WD}" > "${YAML}"
+  if [ "$ANNOTATION" != "" ] && [ "$LABEL" != "" ]; then
+    helm -n ${NAMESPACE} template \
+      --set serviceHost="${SERVICEHOST}" \
+      --set Namespace="${NAMESPACE}" \
+      --set ingress="${GATEWAY_URL}" \
+      --set domain="${DNS_DOMAIN}" \
+      --set https="${HTTPS}" \
+      --set label="${LABEL}" \
+      --set annotation="${ANNOTATION}" \
+      ${LOADCLIENT_EXTRA_HELM_FLAGS} \
+            "${WD}" > "${YAML}"
+  elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
+    helm -n ${NAMESPACE} template \
+      --set serviceHost="${SERVICEHOST}" \
+      --set Namespace="${NAMESPACE}" \
+      --set ingress="${GATEWAY_URL}" \
+      --set domain="${DNS_DOMAIN}" \
+      --set https="${HTTPS}" \
+      --set label="${LABEL}" \
+      ${LOADCLIENT_EXTRA_HELM_FLAGS} \
+            "${WD}" > "${YAML}"
+  elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
+    helm -n ${NAMESPACE} template \
+      --set serviceHost="${SERVICEHOST}" \
+      --set Namespace="${NAMESPACE}" \
+      --set ingress="${GATEWAY_URL}" \
+      --set domain="${DNS_DOMAIN}" \
+      --set https="${HTTPS}" \
+      --set annotation="${ANNOTATION}" \
+      ${LOADCLIENT_EXTRA_HELM_FLAGS} \
+            "${WD}" > "${YAML}"
+  else 
+      helm -n ${NAMESPACE} template \
+      --set serviceHost="${SERVICEHOST}" \
+      --set Namespace="${NAMESPACE}" \
+      --set ingress="${GATEWAY_URL}" \
+      --set domain="${DNS_DOMAIN}" \
+      --set https="${HTTPS}" \
+      ${LOADCLIENT_EXTRA_HELM_FLAGS} \
+            "${WD}" > "${YAML}"
+  fi
   echo "Wrote ${YAML}"
 
   if [[ -z "${DELETE}" ]];then

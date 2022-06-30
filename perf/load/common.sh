@@ -49,7 +49,7 @@ function run_test() {
           --set multicluster.cluster1="${CLUSTER1}" \
           --set multicluster.cluster2="${CLUSTER2}" \
           --set vm.enabled="${VM_ENABLED}" \
-          --set-string label.${LABEL} \
+          --set-string label."${LABEL}" \
           . > "${YAML}"
   elif [ "$LABEL" == "" ] && [ "$ANNOTATION" != "" ]; then
     helm -n ${ns} template \
@@ -63,7 +63,7 @@ function run_test() {
           --set multicluster.cluster1="${CLUSTER1}" \
           --set multicluster.cluster2="${CLUSTER2}" \
           --set vm.enabled="${VM_ENABLED}" \
-          --set-string annotation.'"${ANNOTATION}"' \
+          --set-string annotation."${ANNOTATION}" \
           . > "${YAML}"
   elif [ "$LABEL" == "" ] && [ "$ANNOTATION" == "" ]; then
     helm -n ${ns} template \
@@ -91,7 +91,8 @@ function run_test() {
           --set multicluster.cluster2="${CLUSTER2}" \
           --set vm.enabled="${VM_ENABLED}" \
           --set annotation="${ANNOTATION}" \
-          --set-string label.'"${LABEL}"' \
+          --set-string label."${LABEL}" \
+          --set-string annotation."${ANNOTATION}" \
           . > "${YAML}" 
   fi 
   echo "Wrote ${YAML}"

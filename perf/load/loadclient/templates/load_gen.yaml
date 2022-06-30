@@ -18,6 +18,7 @@ spec:
         {{ toYaml .Values.label  }}
 {{- end }}
 {{- if .Values.annotation }}
+      annotations:
         {{ toYaml .Values.annotation }}
 {{- end }}
     spec:
