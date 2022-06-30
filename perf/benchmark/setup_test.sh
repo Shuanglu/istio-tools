@@ -111,7 +111,7 @@ function run_test() {
     fi
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
   cp -R ../../../kustomization "${TMPDIR}"/
-  sed -e "s/NAMESPACE/${NAMESPACE}/g" -e "s|ENVOY|${WD}\/kusotmization\/components\/envoy|g" ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
+  sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
   
   # remove stdio rules
   kustomize build "${TMPDIR}/kustomization" | kubectl apply -n "${NAMESPACE}" -f - || true
