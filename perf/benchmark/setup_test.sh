@@ -33,9 +33,8 @@ RBAC_ENABLED="false"
 SERVER_REPLICA="${SERVER_REPLICA:-1}"
 CLIENT_REPLICA="${CLIENT_REPLICA:-1}"
 ISTIO_INJECT="${ISTIO_INJECT:-false}"
-LINKERD_INJECT="${LINKERD_INJECT:-disabled}"
-KUMA_INJECT="${KUMA_INJECT:-disabled}"
-NGINX_INJECT="${NGINX_INJECT:-false}"
+LABEL="${LABEL}"
+ANNOTATION="${ANNOTATION}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 echo "linkerd inject is ${LINKERD_INJECT}"
@@ -61,17 +60,11 @@ function run_test() {
       --set includeOutboundIPRanges=$(svc_ip_range) \
       --set server.replica="${SERVER_REPLICA}" \
       --set client.replica="${CLIENT_REPLICA}" \
-      --set server.inject="${ISTIO_INJECT}"  \
-      --set client.inject="${ISTIO_INJECT}" \
-      --set server.injectL="${LINKERD_INJECT}" \
-      --set client.injectL="${LINKERD_INJECT}" \
-      --set server.injectK="${KUMA_INJECT}" \
-      --set client.injectK="${KUMA_INJECT}" \
-      --set server.injectN="${NGINX_INJECT}" \
-      --set client.injectN="${NGINX_INJECT}" \
       --set domain="${DNS_DOMAIN}" \
       --set interceptionMode="${INTERCEPTION_MODE}" \
       --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+      --set-string label.'"${LABEL}"' \
+      --set-string annotation.'"${ANNOTATION}"' \
           . > "${TMPDIR}/${NAMESPACE}.yaml"
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
 
