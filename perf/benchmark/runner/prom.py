@@ -113,49 +113,55 @@ class Prom:
             xform=xform,
             aggregate=self.aggregate)
 
-    def fetch_istio_proxy_cpu_usage_by_pod_name(self):
-        cpu_query = 'sum(rate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container="istio-proxy"}[1m])) by (pod)'
+    def fetch_istio_proxy_cpu_usage_by_pod_name(self,sidecar=""):
+        cpu_query = 'sum(rate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container={}}[1m])) by (pod)'.format(sidecar)
         data = self.fetch_by_query(cpu_query)
         avg_cpu_dict = get_average_within_query_time_range(data, "cpu")
         return avg_cpu_dict
 
-    def fetch_istio_proxy_memory_usage_by_pod_name(self):
-        mem_query = 'container_memory_usage_bytes{job = "kubernetes-cadvisor", container="istio-proxy"}'
+    def fetch_istio_proxy_memory_usage_by_pod_name(self,sidecar=""):
+        mem_query = 'container_memory_usage_bytes{job = "kubernetes-cadvisor", container={}}'.format(sidecar)
         data = self.fetch_by_query(mem_query)
         avg_mem_dict = get_average_within_query_time_range(data, "mem")
         return avg_mem_dict
 
-    def fetch_istio_proxy_cpu_and_mem(self):
+    def fetch_istio_proxy_cpu_and_mem(self,sidecar=""):
         out = {}
 
-        avg_cpu_dict = self.fetch_istio_proxy_cpu_usage_by_pod_name()
-        out["cpu_mili_avg_istio_proxy_fortioclient"] = avg_cpu_dict["fortioclient"]
-        out["cpu_mili_avg_istio_proxy_fortioserver"] = avg_cpu_dict["fortioserver"]
+        avg_cpu_dict = self.fetch_istio_proxy_cpu_usage_by_pod_name(sidecar)
+        key_cpu_client = 'cpu_mili_avg_{}_fortioclient'.format(sidecar)
+        key_cpu_server = 'cpu_mili_avg_{}_fortioserver'.format(sidecar)
+        out[key_cpu_client] = avg_cpu_dict["fortioclient"]
+        out[key_cpu_server] = avg_cpu_dict["fortioserver"]
         out["cpu_mili_avg_istio_proxy_istio-ingressgateway"] = avg_cpu_dict["istio-ingressgateway"]
 
-        avg_mem_dict = self.fetch_istio_proxy_memory_usage_by_pod_name()
-        out["mem_Mi_avg_istio_proxy_fortioclient"] = avg_mem_dict["fortioclient"]
-        out["mem_Mi_avg_istio_proxy_fortioserver"] = avg_mem_dict["fortioserver"]
+        avg_mem_dict = self.fetch_istio_proxy_memory_usage_by_pod_name(sidecar)
+        key_mem_client = 'mem_Mi_avg_{}_fortioclient'.format(sidecar)
+        key_mem_server = 'mem_Mi_avg_{}_fortioserver'.format(sidecar)
+        out[key_mem_client] = avg_mem_dict["fortioclient"]
+        out[key_mem_server] = avg_mem_dict["fortioserver"]
         out["mem_Mi_avg_istio_proxy_istio-ingressgateway"] = avg_mem_dict["istio-ingressgateway"]
 
         return out
 
     def fetch_cpu_by_container(self):
+        query = 'irate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}[1m])'.format(sidecar)
         return self.fetch(
-            'irate(container_cpu_usage_seconds_total{job="kubernetes-cadvisor",container=~"discovery|istio-proxy|captured|uncaptured"}[1m])',
+            query,
             metric_by_deployment_by_container,
             to_mili_cpus)
 
-    def fetch_memory_by_container(self):
+    def fetch_memory_by_container(self,sidecar=""):
+        query = 'container_memory_usage_bytes{job="kubernetes-cadvisor",container=~"discovery|{}|captured|uncaptured"}'.format(sidecar)
         return self.fetch(
-            'container_memory_usage_bytes{job="kubernetes-cadvisor",container=~"discovery|istio-proxy|captured|uncaptured"}',
+            query,
             metric_by_deployment_by_container,
             to_mega_bytes)
 
-    def fetch_cpu_and_mem(self):
-        out = flatten(self.fetch_cpu_by_container(),
+    def fetch_cpu_and_mem(self,sidecar=""):
+        out = flatten(self.fetch_cpu_by_container(sidecar),
                       "cpu_mili", aggregate=self.aggregate)
-        out.update(flatten(self.fetch_memory_by_container(),
+        out.update(flatten(self.fetch_memory_by_container(sidecar),
                            "mem_Mi", aggregate=self.aggregate))
         return out
 
@@ -360,7 +366,7 @@ def main(argv):
     args = get_parser().parse_args(argv)
     p = Prom(args.url, args.nseconds, end=args.end,
              host=args.host, aggregate=args.aggregate)
-    out = p.fetch_cpu_and_mem()
+    out = p.fetch_cpu_and_mem(args.sidecar)
     resp_out = p.fetch_500s_and_400s()
     out.update(resp_out)
     indent = None
@@ -390,6 +396,10 @@ def get_parser():
     parser.add_argument('--aggregate', dest='aggregate', action='store_true')
     parser.add_argument('--no-aggregate', dest='aggregate',
                         action='store_false')
+    parser.add_argument(
+        "--sidecar",
+        help="sidecar container name. If blank, will set 'istio-proxy' as defult.",
+        default="istio-proxy")
     parser.set_defaults(aggregate=True)
 
     return parser

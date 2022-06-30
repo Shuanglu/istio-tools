@@ -126,7 +126,7 @@ def run_command(command):
     process.wait()
 
 
-def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", namespace=NAMESPACE):
+def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", namespace=NAMESPACE, sidecar=""):
     get_fortioclient_pod_cmd = "kubectl -n {namespace} get pods | grep fortioclient".format(namespace=namespace)
     fortioclient_pod_name = getoutput(get_fortioclient_pod_cmd).split(" ")[0]
     temp_dir_path = tempfile.gettempdir() + "/fortio_json_data"
@@ -185,7 +185,7 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
                 duration = min(gd['ActualDuration'] - min_duration,
                                METRICS_SUMMARY_DURATION)
                 p = prom.Prom(promUrl, duration, start=prom_start)
-                prom_metrics = p.fetch_istio_proxy_cpu_and_mem()
+                prom_metrics = p.fetch_istio_proxy_cpu_and_mem(sidecar)
                 if not prom_metrics:
                     print("... Not found")
                     continue
@@ -250,7 +250,8 @@ def main(argv):
         args.selector,
         args.prometheus,
         args.csv,
-        args.csv_output)
+        args.csv_output,
+        args.sidecar)
 
 
 def get_parser():
@@ -279,6 +280,10 @@ def get_parser():
         "--prometheus",
         help="url to fetch prometheus results from. if blank, will only output Fortio metrics.",
         default="")
+    parser.add_argument(
+        "--sidecar",
+        help="sidecar container name. If blank, will set 'istio-proxy' as defult.",
+        default="istio-proxy")
     return parser
 
 
