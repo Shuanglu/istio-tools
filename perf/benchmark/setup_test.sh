@@ -63,8 +63,8 @@ function run_test() {
       --set domain="${DNS_DOMAIN}" \
       --set interceptionMode="${INTERCEPTION_MODE}" \
       --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-      --set-string label.'"${LABEL}"' \
-      --set-string annotation.'"${ANNOTATION}"' \
+      --set-string label."${LABEL}" \
+      --set-string annotation."${ANNOTATION}" \
           . > "${TMPDIR}/${NAMESPACE}.yaml"
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
 
