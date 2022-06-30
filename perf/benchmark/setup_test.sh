@@ -96,7 +96,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-    elif && [ "$TUBIMESH" != "" ]; then
+    elif  [ "$TUBIMESH" != "" ]; then
         helm -n "${NAMESPACE}" template \
         --set rbac.enabled="${RBAC_ENABLED}" \
         --set namespace="${NAMESPACE}" \
