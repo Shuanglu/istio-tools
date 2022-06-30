@@ -113,7 +113,7 @@ function run_test() {
   sed -e "s/NAMESPACE/${NAMESPACE}/g" -e "s|ENVOY|${WD}\/kusotmization\/components\/envoy|g" ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization.yaml
   
   # remove stdio rules
-  kustomize build "${TMPDIR}/kustomization.yaml" | kubectl apply -n "${NAMESPACE}" -f - || true
+  kustomize build "${TMPDIR}/" | kubectl apply -n "${NAMESPACE}" -f - || true
   # remove stdio rules
   kubectl apply -n "${NAMESPACE}" -f "${TMPDIR}/${NAMESPACE}.yaml" || true
   kubectl rollout status deployment fortioclient -n "${NAMESPACE}" --timeout=5m
