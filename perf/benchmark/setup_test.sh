@@ -110,12 +110,13 @@ function run_test() {
             . > "${TMPDIR}/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/${NAMESPACE}.yaml"
-  sed -e "s/NAMESPACE/${NAMESPACE}/g" -e "s|ENVOY|${WD}\/kusotmization\/components\/envoy|g" ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization.yaml
+  cp -R ../../../kustomization "${TMPDIR}"/
+  sed -e "s/NAMESPACE/${NAMESPACE}/g" -e "s|ENVOY|${WD}\/kusotmization\/components\/envoy|g" ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
   
   # remove stdio rules
-  kustomize build "${TMPDIR}/" | kubectl apply -n "${NAMESPACE}" -f - || true
+  kustomize build "${TMPDIR}/kustomization" | kubectl apply -n "${NAMESPACE}" -f - || true
   # remove stdio rules
-  kubectl apply -n "${NAMESPACE}" -f "${TMPDIR}/${NAMESPACE}.yaml" || true
+  #kubectl apply -n "${NAMESPACE}" -f "${TMPDIR}/${NAMESPACE}.yaml" || true
   kubectl rollout status deployment fortioclient -n "${NAMESPACE}" --timeout=5m
   kubectl rollout status deployment fortioserver -n "${NAMESPACE}" --timeout=5m
   echo "${TMPDIR}/${NAMESPACE}.yaml"
