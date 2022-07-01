@@ -122,6 +122,7 @@ function run_test() {
   kubectl rollout status deployment fortioclient -n "${NAMESPACE}" --timeout=5m
   kubectl rollout status deployment fortioserver -n "${NAMESPACE}" --timeout=5m
   echo "${TMPDIR}/${NAMESPACE}.yaml"
+  rm -rf "${TMPDIR}/kustomization"
 }
 
 for ((i=1; i<=$#; i++)); do
