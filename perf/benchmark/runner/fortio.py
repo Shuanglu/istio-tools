@@ -224,7 +224,7 @@ def write_csv(keys, data, csv_output):
         emptyFile = True
     else:
         with open(csv_output) as r:
-            if len(r.readlines) == 0:
+            if len(r.readlines()) == 0:
                 emptyFile = True
         out = open(csv_output, "a+")
 
