@@ -217,14 +217,19 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
 
 
 def write_csv(keys, data, csv_output):
+    emptyFile = False
     if csv_output is None or csv_output == "":
         fd, csv_output = tempfile.mkstemp(suffix=".csv")
         out = os.fdopen(fd, "wt")
+        emptyFile = True
     else:
+        with open(csv_output) as r:
+            if len(r.readlines) == 0:
+                emptyFile = True
         out = open(csv_output, "a+")
 
     lst = keys.split(',')
-    if len(out.readlines()) == 0:
+    if emptyFile == True:
         out.write(keys + "\n")
 
     for gd in data:
