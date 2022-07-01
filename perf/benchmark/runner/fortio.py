@@ -25,6 +25,8 @@ import subprocess
 import tempfile
 import prom
 from subprocess import getoutput
+import shutil
+
 
 """
     returns data in a single line format
@@ -210,7 +212,7 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
 
     if table:
         return write_table(table, datafile)
-    os.rmdir(temp_dir_path)
+    shutil.rmtree(temp_dir_path)
     return 0
 
 
