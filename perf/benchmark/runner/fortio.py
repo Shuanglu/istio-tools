@@ -224,7 +224,8 @@ def write_csv(keys, data, csv_output):
         out = open(csv_output, "a+")
 
     lst = keys.split(',')
-    out.write(keys + "\n")
+    if len(out.readlines()) == 0:
+        out.write(keys + "\n")
 
     for gd in data:
         row = []
