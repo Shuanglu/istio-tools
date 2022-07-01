@@ -221,7 +221,7 @@ def write_csv(keys, data, csv_output):
         fd, csv_output = tempfile.mkstemp(suffix=".csv")
         out = os.fdopen(fd, "wt")
     else:
-        out = open(csv_output, "w+")
+        out = open(csv_output, "a+")
 
     lst = keys.split(',')
     out.write(keys + "\n")
