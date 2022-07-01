@@ -16,6 +16,7 @@ from __future__ import print_function
 import json
 import os
 import shlex
+from venv import create
 import requests
 from datetime import datetime
 import calendar
@@ -223,9 +224,12 @@ def write_csv(keys, data, csv_output):
         out = os.fdopen(fd, "wt")
         emptyFile = True
     else:
-        with open(csv_output) as r:
-            if len(r.readlines()) == 0:
-                emptyFile = True
+        if os.path.isfile(csv_output) == True:
+            with open(csv_output) as r:
+                if len(r.readlines()) == 0:
+                    emptyFile = True 
+        
+
         out = open(csv_output, "a+")
 
     lst = keys.split(',')
