@@ -210,7 +210,7 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
 
     if table:
         return write_table(table, datafile)
-
+    os.rmdir(temp_dir_path)
     return 0
 
 
