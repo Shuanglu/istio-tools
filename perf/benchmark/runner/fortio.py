@@ -228,8 +228,9 @@ def write_csv(keys, data, csv_output):
             with open(csv_output) as r:
                 if len(r.readlines()) == 0:
                     emptyFile = True 
+        else:
+            emptyFile = True
         
-
         out = open(csv_output, "a+")
 
     lst = keys.split(',')
