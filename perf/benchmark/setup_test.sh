@@ -121,7 +121,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string tubimesh="${TUBIMESH}" \
-        --set istio-mtls="${ISTIO_MTLS}" \
+        --set istioMtls="${ISTIO_MTLS}" \
         --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
         --set appresources1="${APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
