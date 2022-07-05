@@ -38,6 +38,9 @@ ANNOTATION="${ANNOTATION}"
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 TUBIMESH="${TUBIMESH}"
+ISTIO_MTLS="${ISTIO_MTLS}"
+PROXY_RESOURCE_REQUEST="${PROXY_RESOURCE_REQUEST}"
+APPRESOURCES1="${APPRESOURCES1}"
 echo "linkerd inject is ${LINKERD_INJECT}"
 
 mkdir -p "${TMPDIR}/kustomization"
@@ -67,6 +70,9 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
         --set-string annotation."${ANNOTATION}" \
+        --set istio-mtls="${ISTIO_MTLS}" \
+        --set proxyResourceRequest="{PROXY_RESOURCE_REQUEST}" \
+        --set appresources1="{APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
       helm -n "${NAMESPACE}" template \
@@ -81,6 +87,9 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
+        --set istio-mtls="${ISTIO_MTLS}" \
+        --set proxyResourceRequest="{PROXY_RESOURCE_REQUEST}" \
+        --set appresources1="{APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
       helm -n "${NAMESPACE}" template \
@@ -95,6 +104,9 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
+        --set istio-mtls="${ISTIO_MTLS}" \
+        --set proxyResourceRequest="{PROXY_RESOURCE_REQUEST}" \
+        --set appresources1="{APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     elif  [ "$TUBIMESH" != "" ]; then
         helm -n "${NAMESPACE}" template \
@@ -109,6 +121,9 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string tubimesh="${TUBIMESH}" \
+        --set istio-mtls="${ISTIO_MTLS}" \
+        --set proxyResourceRequest="{PROXY_RESOURCE_REQUEST}" \
+        --set appresources1="{APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
     fi
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
