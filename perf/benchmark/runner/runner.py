@@ -122,7 +122,8 @@ class Fortio:
             mesh="istio",
             cacert=None,
             jitter=False,
-            load_gen_type="fortio"):
+            load_gen_type="fortio",
+            access_log=None):
         self.run_id = str(uuid.uuid4()).partition('-')[0]
         self.headers = headers
         self.conn = conn
@@ -149,6 +150,7 @@ class Fortio:
         self.cacert = cacert
         self.jitter = jitter
         self.load_gen_type = load_gen_type
+        self.access_log=access_log
 
         if mesh == "linkerd":
             self.mesh = "linkerd"
@@ -177,17 +179,17 @@ class Fortio:
             sys.exit("invalid load generator %s, must be fortio or nighthawk", self.load_gen_type)
 
     # Baseline is no sidecar mode
-    def baseline(self, load_gen_cmd, sidecar_mode):
-        return load_gen_cmd + "_" + sidecar_mode + " " + self.compute_uri(self.server.ip, "direct_port")
+    def baseline(self, load_gen_cmd):
+        return load_gen_cmd + " " + self.compute_uri(self.server.ip, "direct_port")
 
-    def serversidecar(self, load_gen_cmd, sidecar_mode):
-        return load_gen_cmd + "_" + sidecar_mode + " " + self.compute_uri(self.server.ip, "port")
+    def serversidecar(self, load_gen_cmd):
+        return load_gen_cmd + " " + self.compute_uri(self.server.ip, "port")
 
-    def clientsidecar(self, load_gen_cmd, sidecar_mode):
-        return load_gen_cmd + "_" + sidecar_mode + " " + self.compute_uri(self.server.labels["app"], "direct_port")
+    def clientsidecar(self, load_gen_cmd):
+        return load_gen_cmd + " " + self.compute_uri(self.server.labels["app"], "direct_port")
 
-    def bothsidecar(self, load_gen_cmd, sidecar_mode):
-        return load_gen_cmd + "_" + sidecar_mode + " " + self.compute_uri(self.server.labels["app"], "port")
+    def bothsidecar(self, load_gen_cmd):
+        return load_gen_cmd + " " + self.compute_uri(self.server.labels["app"], "port")
 
     def ingress(self, load_gen_cmd):
         url = urlparse(self.run_ingress)
@@ -203,12 +205,12 @@ class Fortio:
         print('-------------- Running in {sidecar_mode} mode --------------'.format(sidecar_mode=sidecar_mode))
         if load_gen_type == "fortio":
             p = multiprocessing.Process(target=kubectl_exec,
-                                        args=[self.client.name, sidecar_mode_func(load_gen_cmd, sidecar_mode),run_command,"captured"])
+                                        args=[self.client.name, sidecar_mode_func(load_gen_cmd),run_command,"captured"])
             p.start()
             processes.append(p)
         elif load_gen_type == "nighthawk":
             p = multiprocessing.Process(target=run_nighthawk,
-                                        args=[self.client.name, sidecar_mode_func(load_gen_cmd, sidecar_mode),
+                                        args=[self.client.name, sidecar_mode_func(load_gen_cmd),
                                               labels + "_" + sidecar_mode])
             p.start()
             processes.append(p)
@@ -253,13 +255,13 @@ class Fortio:
 
         return headers_cmd
 
-    def generate_fortio_cmd(self, headers_cmd, conn, qps, duration, grpc, cacert_arg, jitter, labels, access_log):
+    def generate_fortio_cmd(self, headers_cmd, conn, qps, duration, grpc, cacert_arg, jitter, labels, access_log=None):
         if duration is None:
             duration = self.duration
-
-        fortio_cmd = (
+        if access_log is None:
+            fortio_cmd = (
             "fortio load {headers} -jitter={jitter} -c {conn} -qps {qps} -t {duration}s -a -r {r} {cacert_arg} {grpc} "
-            "-httpbufferkb=128 -labels {labels} -access-log-file {access_log}").format(
+            "-httpbufferkb=128 -labels {labels} ").format(
             headers=headers_cmd,
             conn=conn,
             qps=qps,
@@ -268,8 +270,21 @@ class Fortio:
             grpc=grpc,
             jitter=jitter,
             cacert_arg=cacert_arg,
-            labels=labels,
-            access_log=access_log)
+            labels=labels)
+        else:
+            fortio_cmd = (
+                "fortio load {headers} -jitter={jitter} -c {conn} -qps {qps} -t {duration}s -a -r {r} {cacert_arg} {grpc} "
+                "-httpbufferkb=128 -labels {labels} -access-log-file {access_log}").format(
+                headers=headers_cmd,
+                conn=conn,
+                qps=qps,
+                duration=duration,
+                r=self.r,
+                grpc=grpc,
+                jitter=jitter,
+                cacert_arg=cacert_arg,
+                labels=labels,
+                access_log=access_log)
 
         return fortio_cmd
 
@@ -336,6 +351,8 @@ class Fortio:
 
         load_gen_cmd = ""
         if self.load_gen_type == "fortio":
+            if access_log is None:
+                load_gen_cmd = self.generate_fortio_cmd(headers_cmd, conn, qps, duration, grpc, cacert_arg, self.jitter, labels)
             load_gen_cmd = self.generate_fortio_cmd(headers_cmd, conn, qps, duration, grpc, cacert_arg, self.jitter, labels, access_log)
         elif self.load_gen_type == "nighthawk":
             # TODO(oschaaf): Figure out how to best determine the right concurrency for Nighthawk.
