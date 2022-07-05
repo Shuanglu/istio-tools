@@ -145,6 +145,8 @@ def sync_fortio(url, table, selector=None, promUrl="", csv=None, csv_output="", 
     data = []
     for filename in os.listdir(temp_dir_path):
         print(filename)
+        if 'access_log' in filename:
+            continue
         with open(os.path.join(temp_dir_path, filename), 'r') as f:
             try:
                 data_dict = json.load(f, strict=False)
