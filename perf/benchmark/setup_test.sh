@@ -70,7 +70,7 @@ function run_test() {
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
         --set-string annotation."${ANNOTATION}" \
-        --set istio-mtls="${ISTIO_MTLS}" \
+        --set istioMtls="${ISTIO_MTLS}" \
         --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
         --set appresources1="${APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
@@ -87,7 +87,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string label."${LABEL}" \
-        --set istio-mtls="${ISTIO_MTLS}" \
+        --set istioMtls="${ISTIO_MTLS}" \
         --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
         --set appresources1="${APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
@@ -104,7 +104,7 @@ function run_test() {
         --set interceptionMode="${INTERCEPTION_MODE}" \
         --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
         --set-string annotation."${ANNOTATION}" \
-        --set istio-mtls="${ISTIO_MTLS}" \
+        --set istioMtls="${ISTIO_MTLS}" \
         --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
         --set appresources1="${APPRESOURCES1}" \
             . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
