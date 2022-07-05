@@ -253,13 +253,13 @@ class Fortio:
 
         return headers_cmd
 
-    def generate_fortio_cmd(self, headers_cmd, conn, qps, duration, grpc, cacert_arg, jitter, labels):
+    def generate_fortio_cmd(self, headers_cmd, conn, qps, duration, grpc, cacert_arg, jitter, labels, access_log):
         if duration is None:
             duration = self.duration
 
         fortio_cmd = (
             "fortio load {headers} -jitter={jitter} -c {conn} -qps {qps} -t {duration}s -a -r {r} {cacert_arg} {grpc} "
-            "-httpbufferkb=128 -labels {labels}").format(
+            "-httpbufferkb=128 -labels {labels} -access-log-file {access_log}").format(
             headers=headers_cmd,
             conn=conn,
             qps=qps,
@@ -268,7 +268,8 @@ class Fortio:
             grpc=grpc,
             jitter=jitter,
             cacert_arg=cacert_arg,
-            labels=labels)
+            labels=labels,
+            access_log=access_log)
 
         return fortio_cmd
 
@@ -320,7 +321,7 @@ class Fortio:
 
         return nighthawk_cmd
 
-    def run(self, headers, conn, qps, size, duration):
+    def run(self, headers, conn, qps, size, duration, access_log):
         labels = self.generate_test_labels(conn, qps, size)
 
         grpc = ""
@@ -335,7 +336,7 @@ class Fortio:
 
         load_gen_cmd = ""
         if self.load_gen_type == "fortio":
-            load_gen_cmd = self.generate_fortio_cmd(headers_cmd, conn, qps, duration, grpc, cacert_arg, self.jitter, labels)
+            load_gen_cmd = self.generate_fortio_cmd(headers_cmd, conn, qps, duration, grpc, cacert_arg, self.jitter, labels, access_log)
         elif self.load_gen_type == "nighthawk":
             # TODO(oschaaf): Figure out how to best determine the right concurrency for Nighthawk.
             # Results seem to get very noisy as the number of workers increases, are the clients
@@ -527,7 +528,7 @@ def run_perf_test(args):
         for conn in fortio.conn:
             for qps in fortio.qps:
                 fortio.run(headers=fortio.headers, conn=conn, qps=qps,
-                           duration=fortio.duration, size=fortio.size)
+                           duration=fortio.duration, size=fortio.size, access_log=access_log)
     finally:
         if port_forward_process is not None:
             port_forward_process.kill()
@@ -658,6 +659,11 @@ def get_parser():
         "--load_gen_type",
         help="fortio or nighthawk",
         default="fortio",
+    )
+    parser.add_argument(
+        "--access_log",
+        help="access log file path for fortio",
+        default="/tmp/access.log"
     )
 
     define_bool(parser, "baseline", "run baseline for all", False)
