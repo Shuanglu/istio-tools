@@ -681,7 +681,7 @@ def get_parser():
     parser.add_argument(
         "--access_log",
         help="access log file path for fortio",
-        default="/tmp/access.log"
+        default=None
     )
 
     define_bool(parser, "baseline", "run baseline for all", False)

@@ -33,8 +33,11 @@ RBAC_ENABLED="false"
 SERVER_REPLICA="${SERVER_REPLICA:-1}"
 CLIENT_REPLICA="${CLIENT_REPLICA:-1}"
 ISTIO_INJECT="${ISTIO_INJECT:-false}"
-LABEL="${LABEL}"
-ANNOTATION="${ANNOTATION}"
+declare -p PODLABELS
+declare -p DEPLOYLABELS
+declare -p PODANNOTATIONS
+declare -p DEPLOYANNOTATIONS
+declare -p TUBIANNOTATIONS
 INTERCEPTION_MODE="${INTERCEPTION_MODE:-REDIRECT}"
 FORTIO_VERSION="${FORTIO_VERSION:-latest_release}"
 TUBIMESH="${TUBIMESH}"
@@ -56,76 +59,58 @@ function svc_ip_range() {
 
 function run_test() {
   # shellcheck disable=SC2046
-  if [ "$ANNOTATION" != "" ] && [ "$LABEL" != "" ]; then
-    helm -n "${NAMESPACE}" template \
-        --set rbac.enabled="${RBAC_ENABLED}" \
-        --set namespace="${NAMESPACE}" \
-        --set loadGenType="${LOAD_GEN_TYPE}" \
-        --set excludeOutboundIPRanges=$(pod_ip_range)\
-        --set includeOutboundIPRanges=$(svc_ip_range) \
-        --set server.replica="${SERVER_REPLICA}" \
-        --set client.replica="${CLIENT_REPLICA}" \
-        --set domain="${DNS_DOMAIN}" \
-        --set interceptionMode="${INTERCEPTION_MODE}" \
-        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-        --set-string label."${LABEL}" \
-        --set-string annotation."${ANNOTATION}" \
-        --set istioMtls="${ISTIO_MTLS}" \
-        --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
-        --set appresources1="${APPRESOURCES1}" \
-            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-  elif [ "$ANNOTATION" == "" ] && [ "$LABEL" != "" ]; then
-      helm -n "${NAMESPACE}" template \
-        --set rbac.enabled="${RBAC_ENABLED}" \
-        --set namespace="${NAMESPACE}" \
-        --set loadGenType="${LOAD_GEN_TYPE}" \
-        --set excludeOutboundIPRanges=$(pod_ip_range)\
-        --set includeOutboundIPRanges=$(svc_ip_range) \
-        --set server.replica="${SERVER_REPLICA}" \
-        --set client.replica="${CLIENT_REPLICA}" \
-        --set domain="${DNS_DOMAIN}" \
-        --set interceptionMode="${INTERCEPTION_MODE}" \
-        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-        --set-string label."${LABEL}" \
-        --set istioMtls="${ISTIO_MTLS}" \
-        --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
-        --set appresources1="${APPRESOURCES1}" \
-            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-    elif [ "$ANNOTATION" != "" ] && [ "$LABEL" == "" ]; then
-      helm -n "${NAMESPACE}" template \
-        --set rbac.enabled="${RBAC_ENABLED}" \
-        --set namespace="${NAMESPACE}" \
-        --set loadGenType="${LOAD_GEN_TYPE}" \
-        --set excludeOutboundIPRanges=$(pod_ip_range)\
-        --set includeOutboundIPRanges=$(svc_ip_range) \
-        --set server.replica="${SERVER_REPLICA}" \
-        --set client.replica="${CLIENT_REPLICA}" \
-        --set domain="${DNS_DOMAIN}" \
-        --set interceptionMode="${INTERCEPTION_MODE}" \
-        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-        --set-string annotation."${ANNOTATION}" \
-        --set istioMtls="${ISTIO_MTLS}" \
-        --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
-        --set appresources1="${APPRESOURCES1}" \
-            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-    elif  [ "$TUBIMESH" != "" ]; then
-        helm -n "${NAMESPACE}" template \
-        --set rbac.enabled="${RBAC_ENABLED}" \
-        --set namespace="${NAMESPACE}" \
-        --set loadGenType="${LOAD_GEN_TYPE}" \
-        --set excludeOutboundIPRanges=$(pod_ip_range)\
-        --set includeOutboundIPRanges=$(svc_ip_range) \
-        --set server.replica="${SERVER_REPLICA}" \
-        --set client.replica="${CLIENT_REPLICA}" \
-        --set domain="${DNS_DOMAIN}" \
-        --set interceptionMode="${INTERCEPTION_MODE}" \
-        --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
-        --set-string tubimesh="${TUBIMESH}" \
-        --set istioMtls="${ISTIO_MTLS}" \
-        --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
-        --set appresources1="${APPRESOURCES1}" \
-            . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
-    fi
+  if [ $PODLABELS != "" ]; then
+    for PODLABEL in ${PODLABELS[@]}; 
+    do 
+        TMP="--set-string podlabel.$PODLABEL"
+        HELMPODLABELS=$HELMPODLABELS" "$TMP
+    done
+  fi
+  if [ $PODANNOTATIONS != "" ]; then
+    for PODANNOTATION in ${PODANNOTATIONS[@]};
+    do
+        TMP="--set-string podannotation.$PODANNOTATION"
+        HEMPODANNOTATION=$HEMPODANNOTATION" "$TMP
+    done
+  fi
+  if [ $DEPLOYLABELS != "" ]; then
+    for DEPLOYLABEL in ${DEPLOYLABELS[@]}; 
+    do 
+        TMP="--set-string deploylabel.$DEPLOYLABEL"
+        HELMDEPLOYLABELS=$HELMDEPLOYLABELS" "$TMP
+    done
+  fi
+  if [ $DEPLOYANNOTATIONS != "" ]; then
+    for DEPLOYANNOTATION in ${DEPLOYANNOTATIONS[@]}; 
+    do 
+        TMP="--set-string deployannotation.$DEPLOYANNOTATION"
+        HELMANNOTATIONS=$HELMANNOTATIONS" "$TMP
+    done
+  fi
+  if [ $TUBIMESH != "" ]; then 
+    HELMCLIENTTUBIANNOTATIONS="--set-string tubiclientannotation.${TUBIANNOTATIONS[0]}"
+    HELMSERVERTUBIANNOTATIONS="--set-string tubiserverannotation.${TUBIANNOTATIONS[1]}"
+  fi
+  helm -n "${NAMESPACE}" template \
+    --set rbac.enabled="${RBAC_ENABLED}" \
+    --set namespace="${NAMESPACE}" \
+    --set loadGenType="${LOAD_GEN_TYPE}" \
+    --set server.replica="${SERVER_REPLICA}" \
+    --set client.replica="${CLIENT_REPLICA}" \
+    --set domain="${DNS_DOMAIN}" \
+    --set fortioImage="fortio/fortio:${FORTIO_VERSION}" \
+    ${HELMPODLABELS} \
+    ${HELMDEPLOYLABELS} \
+    ${HEMPODANNOTATION} \
+    ${HELMANNOTATIONS} \
+    ${HELMTUBIANNOTATIONS} \
+    ${HELMCLIENTTUBIANNOTATIONS} \
+    ${HELMSERVERTUBIANNOTATIONS} \
+    --set istioMtls="${ISTIO_MTLS}" \
+    --set proxyResourceRequest="${PROXY_RESOURCE_REQUEST}" \
+    --set appresources1="${APPRESOURCES1}" \
+        . > "${TMPDIR}/kustomization/${NAMESPACE}.yaml"
+
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   cp -R ../../../kustomization "${TMPDIR}"/
   sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
