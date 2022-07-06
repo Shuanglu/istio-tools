@@ -59,35 +59,35 @@ function svc_ip_range() {
 
 function run_test() {
   # shellcheck disable=SC2046
-  if [ $PODLABELS != "" ]; then
+  if [[ "$PODLABELS" != "" ]]; then
     for PODLABEL in ${PODLABELS[@]}; 
     do 
         TMP="--set-string podlabel.$PODLABEL"
         HELMPODLABELS=$HELMPODLABELS" "$TMP
     done
   fi
-  if [ $PODANNOTATIONS != "" ]; then
+  if [[ "$PODANNOTATIONS" != "" ]]; then
     for PODANNOTATION in ${PODANNOTATIONS[@]};
     do
         TMP="--set-string podannotation.$PODANNOTATION"
         HEMPODANNOTATION=$HEMPODANNOTATION" "$TMP
     done
   fi
-  if [ $DEPLOYLABELS != "" ]; then
+  if [[ "$DEPLOYLABELS" != "" ]]; then
     for DEPLOYLABEL in ${DEPLOYLABELS[@]}; 
     do 
         TMP="--set-string deploylabel.$DEPLOYLABEL"
         HELMDEPLOYLABELS=$HELMDEPLOYLABELS" "$TMP
     done
   fi
-  if [ $DEPLOYANNOTATIONS != "" ]; then
+  if [[ "$DEPLOYANNOTATIONS" != "" ]]; then
     for DEPLOYANNOTATION in ${DEPLOYANNOTATIONS[@]}; 
     do 
         TMP="--set-string deployannotation.$DEPLOYANNOTATION"
         HELMANNOTATIONS=$HELMANNOTATIONS" "$TMP
     done
   fi
-  if [ $TUBIMESH != "" ]; then 
+  if [[ "$TUBIMESH" != "" ]]; then 
     HELMCLIENTTUBIANNOTATIONS="--set-string tubiclientannotation.${TUBIANNOTATIONS[0]}"
     HELMSERVERTUBIANNOTATIONS="--set-string tubiserverannotation.${TUBIANNOTATIONS[1]}"
   fi
