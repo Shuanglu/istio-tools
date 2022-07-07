@@ -113,8 +113,12 @@ function run_test() {
 
   echo "Wrote file ${TMPDIR}/kustomization/${NAMESPACE}.yaml"
   cp -R ../../../kustomization "${TMPDIR}"/
-  sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
-  
+    if [[ "$TUBIMESH" == "true" ]]; then 
+    sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml.tubi > "${TMPDIR}"/kustomization/kustomization.yaml
+  else
+    sed -e "s/NAMESPACE/${NAMESPACE}/g"  ../../../kustomization/kustomization.yaml > "${TMPDIR}"/kustomization/kustomization.yaml
+  fi
+
   # remove stdio rules
   kustomize build "${TMPDIR}/kustomization" | kubectl apply -n "${NAMESPACE}" -f - || true
   # remove stdio rules

@@ -34,7 +34,8 @@ spec:
     protocol: TCP
   - name: grpc-ping
     port: 8079
-    protocol: TCP
+    #protocol: TCP
+    appProtocol: TCP
   - name: tcp-echo
     port: 8078
     protocol: TCP

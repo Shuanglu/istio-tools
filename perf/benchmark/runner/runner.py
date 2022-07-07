@@ -123,7 +123,8 @@ class Fortio:
             cacert=None,
             jitter=False,
             load_gen_type="fortio",
-            access_log=None):
+            access_log=None,
+            address=None):
         self.run_id = str(uuid.uuid4()).partition('-')[0]
         self.headers = headers
         self.conn = conn
@@ -151,7 +152,7 @@ class Fortio:
         self.jitter = jitter
         self.load_gen_type = load_gen_type
         self.access_log=access_log
-
+        self.address=address
         if mesh == "linkerd":
             self.mesh = "linkerd"
         elif mesh == "istio":
@@ -165,16 +166,27 @@ class Fortio:
         return "https" if self.protocol_mode == "grpc" else self.protocol_mode
 
     def compute_uri(self, svc, port_type):
+        if self.address is not None:
+            tmp = self.address.split(":")
+            svc = tmp[0]
+            port = tmp[1]
         if self.load_gen_type == "fortio":
             basestr = "{protocol}://{svc}:{port}/echo?size={size}"
             if self.protocol_mode == "grpc":
                 basestr = "-payload-size {size} {svc}:{port}"
             elif self.protocol_mode == "tcp":
                 basestr = "{protocol}://{svc}:{port}"
-            return basestr.format(svc=svc, port=self.ports[self.protocol_mode][port_type], size=self.size, protocol=self.get_protocol_uri_fragment())
+            if self.address is None:
+                return basestr.format(svc=svc, port=self.ports[self.protocol_mode][port_type], size=self.size, protocol=self.get_protocol_uri_fragment())
+            else:
+                return basestr.format(svc=svc, port=port, size=self.size, protocol=self.get_protocol_uri_fragment())
         elif self.load_gen_type == "nighthawk":
-            return "{protocol}://{svc}:{port}/".format(
-                svc=svc, port=self.ports[self.protocol_mode][port_type], protocol=self.get_protocol_uri_fragment())
+            if self.address is None:
+                return "{protocol}://{svc}:{port}/".format(
+                    svc=svc, port=self.ports[self.protocol_mode][port_type], protocol=self.get_protocol_uri_fragment())
+            else:
+                return "{protocol}://{svc}:{port}/".format(
+                    svc=svc, port=port, protocol=self.get_protocol_uri_fragment())
         else:
             sys.exit("invalid load generator %s, must be fortio or nighthawk", self.load_gen_type)
 
@@ -514,7 +526,8 @@ def run_perf_test(args):
             telemetry_mode=args.telemetry_mode,
             cacert=args.cacert,
             jitter=args.jitter,
-            load_gen_type=args.load_gen_type)
+            load_gen_type=args.load_gen_type,
+            address=args.address)
 
     if fortio.duration <= min_duration:
         print("Duration must be greater than {min_duration}".format(
@@ -683,7 +696,12 @@ def get_parser():
         help="access log file path for fortio",
         default=None
     )
-
+    parser.add_argument(
+        "--address",
+        help="server FQDN:Port",
+        default=None
+    )
+    
     define_bool(parser, "baseline", "run baseline for all", False)
     define_bool(parser, "serversidecar",
                 "run serversidecar-only for all", False)
